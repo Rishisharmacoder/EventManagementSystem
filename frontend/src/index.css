@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  --color-primary: #002D5B; /* Refined BFGI Navy Blue */
+  --color-secondary: #F58220; /* Refined BFGI Orange */
+  --color-accent: #00AEEF; /* BFGI Light Blue */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  
+  --shadow-professional: 0 10px 30px -10px rgba(0, 45, 91, 0.1);
+  --shadow-professional-hover: 0 20px 40px -15px rgba(0, 45, 91, 0.15);
+}
+
+@layer components {
+  .nav-link {
+    @apply flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-slate-600 transition-all duration-300 hover:text-primary hover:bg-slate-50 active:scale-95 text-sm;
+  }
+  
+  .nav-link-active {
+    @apply text-primary bg-primary/5;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight;
+  }
+
+  .section-subtitle {
+    @apply text-slate-500 font-medium text-lg max-w-2xl;
+  }
+}
+
+.bfgi-gradient {
+  background: linear-gradient(135deg, #002D5B 0%, #0055aa 100%);
+}
+
+.bfgi-card {
+  @apply bg-white border border-slate-100 shadow-[var(--shadow-professional)] hover:shadow-[var(--shadow-professional-hover)] transition-all duration-500 rounded-[2rem];
+}
+
+.glass-panel {
+  @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl;
+}
