@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../store/slices/authSlice.js';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
+import { Mail, Lock, LogIn, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import api from '../services/api.js';
 
 export default function Login() {
@@ -11,7 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -84,13 +84,20 @@ export default function Login() {
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-5 h-5 text-base-content/40" />
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   placeholder="••••••••" 
-                  className="input input-bordered w-full pl-10" 
+                  className="input input-bordered w-full pl-10 pr-10" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button 
+                  type="button" 
+                  className="absolute right-3 top-3 text-base-content/40 hover:text-base-content transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
               <label className="label">
                 <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
@@ -107,11 +114,21 @@ export default function Login() {
             </button>
           </form>
 
-          <div className="divider">OR</div>
+         {/* Divider with explicit color */}
+          <div className="divider before:bg-slate-200 after:bg-slate-200 text-slate-400 text-xs font-bold">
+            OR
+          </div>
 
-          <div className="text-center space-y-2">
-            <p className="text-sm">Don't have an account? <Link to="/signup" className="link link-primary font-semibold">Sign Up</Link></p>
-            <p className="text-xs text-base-content/40 italic">Admin? <Link to="/admin-login" className="link link-secondary">Login here</Link></p>
+          <div className="text-center space-y-2 pb-2">
+            <p className="text-sm text-slate-500">
+              Don't have an account?{" "}
+              <Link 
+                to="/signup" 
+                className="text-primary font-bold hover:underline transition-all"
+              >
+                Sign Up
+              </Link>
+            </p>
           </div>
         </div>
       </motion.div>

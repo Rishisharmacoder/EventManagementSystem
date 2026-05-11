@@ -1,45 +1,67 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { useDispatch } from 'react-redux';
-import { setCredentials } from '../store/slices/authSlice.js';
-import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Lock, UserPlus, AlertCircle } from 'lucide-react';
-import api from '../services/api.js';
+import React, { useState } from "react";
+import { motion } from "motion/react";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../store/slices/authSlice.js";
+import { useNavigate, Link } from "react-router-dom";
+import { User, Mail, Lock, UserPlus, AlertCircle, Eye, EyeOff } from "lucide-react";
+import api from "../services/api.js";
+import validator from "validator";
 
 export default function Signup() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const validateInputs = () => {
+    if (!validator.isEmail(email)) {
+      setError("Invalid email format");
+      return false;
+    }
+    if (!validator.isStrongPassword(password)) {
+      setError(
+        "Password must be strong (e.g., include uppercase, lowercase, numbers, and symbols)",
+      );
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      return setError('Passwords do not match');
+      return setError("Passwords do not match");
     }
-    
+
+    if (!validateInputs()) return;
+
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       // Split full name to pass to backend
-      const nameParts = name.trim().split(' ');
+      const nameParts = name.trim().split(" ");
       const firstName = nameParts[0];
-      const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ' ';
-      
-      const { data } = await api.post('/user/register', {
-        firstName, lastName, emailId: email, password
+      const lastName =
+        nameParts.length > 1 ? nameParts.slice(1).join(" ") : " ";
+
+      const { data } = await api.post("/user/register", {
+        firstName,
+        lastName,
+        emailId: email,
+        password,
       });
-      
+
       dispatch(setCredentials(data.user));
-      navigate('/');
+      navigate("/");
     } catch (err) {
-      setError('Registration failed. Please try again.');
+      setError("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -47,18 +69,22 @@ export default function Signup() {
 
   return (
     <div className="flex justify-center items-center min-h-[90vh] px-4 py-16">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bfgi-card w-full max-w-md p-10 md:p-12"
       >
         <div className="space-y-8">
           <div className="text-center space-y-4">
-            <div className="bg-primary/5 w-20 h-20 rounded-[2rem] flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <div className="bg-primary/5 w-20 h-20 rounded-4xl flex items-center justify-center mx-auto mb-6 shadow-inner">
               <UserPlus className="w-10 h-10 text-primary" />
             </div>
-            <h2 className="text-4xl font-black text-slate-900 tracking-tighter">Join BFGI</h2>
-            <p className="text-slate-500 font-medium">Create your student account</p>
+            <h2 className="text-4xl font-black text-slate-900 tracking-tighter">
+              Join BFGI
+            </h2>
+            <p className="text-slate-500 font-medium">
+              Create your student account
+            </p>
           </div>
 
           {error && (
@@ -75,10 +101,10 @@ export default function Signup() {
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-3 w-5 h-5 text-base-content/40" />
-                <input 
-                  type="text" 
-                  placeholder="John Doe" 
-                  className="input input-bordered w-full pl-10" 
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  className="input input-bordered w-full pl-10"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
@@ -92,10 +118,10 @@ export default function Signup() {
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-5 h-5 text-base-content/40" />
-                <input 
-                  type="email" 
-                  placeholder="email@bfcet.com" 
-                  className="input input-bordered w-full pl-10" 
+                <input
+                  type="email"
+                  placeholder="email@bfcet.com"
+                  className="input input-bordered w-full pl-10"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -109,37 +135,53 @@ export default function Signup() {
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-5 h-5 text-base-content/40" />
-                <input 
-                  type="password" 
-                  placeholder="••••••••" 
-                  className="input input-bordered w-full pl-10" 
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="input input-bordered w-full pl-10 pr-10"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button 
+                  type="button" 
+                  className="absolute right-3 top-3 text-base-content/40 hover:text-base-content transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
             </div>
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-semibold">Confirm Password</span>
+                <span className="label-text font-semibold">
+                  Confirm Password
+                </span>
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-5 h-5 text-base-content/40" />
-                <input 
-                  type="password" 
-                  placeholder="••••••••" 
-                  className="input input-bordered w-full pl-10" 
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="••••••••"
+                  className="input input-bordered w-full pl-10 pr-10"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
+                <button 
+                  type="button" 
+                  className="absolute right-3 top-3 text-base-content/40 hover:text-base-content transition-colors"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
             </div>
 
-            <button 
-              type="submit" 
-              className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+            <button
+              type="submit"
+              className={`btn btn-primary w-full ${loading ? "loading" : ""}`}
               disabled={loading}
             >
               {!loading && <UserPlus className="w-5 h-5 mr-2" />}
@@ -147,10 +189,20 @@ export default function Signup() {
             </button>
           </form>
 
-          <div className="divider">OR</div>
+          <div className="divider before:bg-slate-300 after:bg-slate-300 text-slate-500 font-medium text-xs">
+            OR
+          </div>
 
-          <div className="text-center">
-            <p className="text-sm">Already have an account? <Link to="/login" className="link link-primary font-semibold">Login</Link></p>
+          <div className="text-center pb-2">
+            <p className="text-sm text-slate-600">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-primary font-bold hover:text-primary-focus transition-colors underline underline-offset-4"
+              >
+                Login
+              </Link>
+            </p>
           </div>
         </div>
       </motion.div>

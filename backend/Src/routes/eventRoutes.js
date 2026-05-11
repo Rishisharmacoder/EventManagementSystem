@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const adminMiddleware = require("../middleware/adminMiddlewere");
-const userMiddleware = require("../middleware/userMiddlewere");
+const adminMiddleware = require("../middleware/adminMiddleware");
+const userMiddleware = require("../middleware/userMiddleware");
 const {
     createEvent,
     updateEvent,
@@ -18,7 +18,7 @@ router.delete("/delete/:id", adminMiddleware, deleteEvent);
 router.get("/my-events", adminMiddleware, getMyEvents);
 
 // Authenticated users
-router.get("/all", userMiddleware, getAllEvents);
+router.get("/all", getAllEvents);
 router.get("/:id", userMiddleware, getEventById);
 
 module.exports = router;

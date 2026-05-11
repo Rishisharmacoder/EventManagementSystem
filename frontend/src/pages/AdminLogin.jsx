@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../store/slices/authSlice.js';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShieldCheck, Lock, LogIn, AlertCircle } from 'lucide-react';
+import { ShieldCheck, Lock, LogIn, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import api from '../services/api.js';
 
 export default function AdminLogin() {
@@ -11,7 +11,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -82,13 +82,20 @@ export default function AdminLogin() {
               <div className="relative">
                 <Lock className="absolute left-3 top-3 w-5 h-5 text-base-content/40" />
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   placeholder="••••••••" 
-                  className="input input-bordered w-full pl-10" 
+                  className="input input-bordered w-full pl-10 pr-10" 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <button 
+                  type="button" 
+                  className="absolute right-3 top-3 text-base-content/40 hover:text-base-content transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
             </div>
 

@@ -2,6 +2,7 @@ const redisClient = require('../config/redis');
 const User = require('../models/user');
 const validate = require('../utils/validator');
 const bcrypt = require("bcrypt")
+const bcryptjs = require("bcryptjs")
 const jwt = require('jsonwebtoken');
 const Registration = require('../models/registration');
 
@@ -10,8 +11,8 @@ const register = async (req,res)=>{
 
     try{
      // validate the data
-       validate(req.body);
-        
+        validate(req.body);
+         
         const {firstName, emailId, password} = req.body;
 
         req.body.password = await bcrypt.hash(password, 10);
@@ -52,7 +53,15 @@ const login = async(req,res)=>{
         if(!user)
             throw new Error("User Not Found");
 
-        const match = bcrypt.compare(password, user.password)
+        let match = await bcrypt.compare(password, user.password);
+        
+        if (!match) {
+            match = await bcryptjs.compare(password, user.password);
+            if (match) {
+                user.password = await bcrypt.hash(password, 10);
+                await user.save();
+            }
+        }
 
         if(!match){
             throw new Error("Invalid Credentials");
@@ -61,14 +70,15 @@ const login = async(req,res)=>{
         const reply = {
             firstName: user.firstName,
             emailId: user.emailId,
-            _id: user._id
+            _id: user._id,
+            role: user.role
         }
 
         const token = jwt.sign({_id:user._id ,emailId: emailId, role:user.role},process.env.JWT_KEY,{expiresIn: 60*60});
-        res.cookie('token',token,{maxAge: 60*60*1000}); 
-        res.status(201).json({
-            user:reply,
-            message:"Login Successfully"
+        res.cookie('token', token, { maxAge: 60 * 60 * 1000, httpOnly: true, sameSite: 'strict' });
+        res.status(200).json({
+            user: reply,
+            message: "Login Successfully"
         })
     } 
     catch(err){
@@ -86,30 +96,31 @@ const logout = async (req, res,next) => {
         await redisClient.set(`token:${token}`, "Blocked");
         await redisClient.expireAt(`token:${token}`, payload.exp);
 
-        res.cookie("token", null, { expires: new Date(Date.now()) });
-
-        res.send("Logged Out Successfully");
+        res.clearCookie("token", { httpOnly: true, sameSite: 'strict' });
+        res.status(200).json({ message: "Logged Out Successfully" });
 
     } catch (err) {
         res.status(503).send("Error: " + err.message);
     }
 }
 
-const adminRegister = async (req,res)=>{
-    try{
-     // validate the data
-       validate(req.body);
-        
-        const {firstName, emailId, password} = req.body;
 
-        req.body.password = await bcrypt.hash(password, 10);
-        //  Role set: agar body mein role='admin' hai to admin, nahi to user
-        req.body.role = req.body.role === 'admin' ? 'admin' : 'user';
-        
-        const user = await User.create(req.body);
-        const token = jwt.sign({_id:user._id ,emailId: emailId, role:user.role}, process.env.JWT_KEY, {expiresIn: 60*60});
-        res.cookie('token',token,{maxAge: 60*60*1000});
-        res.status(201).send("User Registered Successfully");
+
+const adminRegister = async(req,res)=>{
+    try{
+        // validate the data;
+    //   if(req.result.role!='admin')
+    //     throw new Error("Invalid Credentials");  
+      validate(req.body); 
+      const {firstName, emailId, password}  = req.body;
+
+      req.body.password = await bcrypt.hash(password, 10);
+    //
+    
+     const user =  await User.create(req.body);
+     const token =  jwt.sign({_id:user._id , emailId:emailId, role:user.role},process.env.JWT_KEY,{expiresIn: 60*60});
+     res.cookie('token',token,{maxAge: 60*60*1000});
+     res.status(201).send("User Registered Successfully");
     }
     catch(err){
         res.status(400).send("Error: "+err);
@@ -119,7 +130,7 @@ const adminRegister = async (req,res)=>{
 const getProfile = async (req, res) => {
 
     try {
-        const userId = req.result._id;
+        const userId = req.user._id;
 
         const user = await User.findById(userId).select("-password");
 

@@ -1,8 +1,8 @@
 const express = require('express');
 const authRouter = express.Router();
 const {register, login, logout,adminRegister,getProfile,emailVerify,resetEmail,deleteProfile,setupFirstAdmin} = require('../controllers/userAuthent');
-const userMiddleware = require("../middleware/userMiddlewere")
-const adminMiddlewere = require("../middleware/adminMiddlewere");
+const userMiddleware = require("../middleware/userMiddleware")
+const adminMiddlewere = require("../middleware/adminMiddleware");
 const User = require('../models/user');
 
 

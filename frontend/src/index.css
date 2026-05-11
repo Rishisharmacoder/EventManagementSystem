@@ -2,11 +2,11 @@
 @plugin "daisyui";
 
 @theme {
-  --color-primary: #002D5B; /* Refined BFGI Navy Blue */
-  --color-secondary: #F58220; /* Refined BFGI Orange */
-  --color-accent: #00AEEF; /* BFGI Light Blue */
+  --color-primary: #002d5b; /* Refined BFGI Navy Blue */
+  --color-secondary: #f58220; /* Refined BFGI Orange */
+  --color-accent: #00aeef; /* BFGI Light Blue */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  
+
   --shadow-professional: 0 10px 30px -10px rgba(0, 45, 91, 0.1);
   --shadow-professional-hover: 0 20px 40px -15px rgba(0, 45, 91, 0.15);
 }
@@ -15,7 +15,7 @@
   .nav-link {
     @apply flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-slate-600 transition-all duration-300 hover:text-primary hover:bg-slate-50 active:scale-95 text-sm;
   }
-  
+
   .nav-link-active {
     @apply text-primary bg-primary/5;
   }
@@ -30,7 +30,7 @@
 }
 
 .bfgi-gradient {
-  background: linear-gradient(135deg, #002D5B 0%, #0055aa 100%);
+  background: linear-gradient(135deg, #002d5b 0%, #0055aa 100%);
 }
 
 .bfgi-card {

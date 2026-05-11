@@ -60,7 +60,13 @@ exports.getEventById = async (req, res) => {
     try {
         const event = await Event.findById(id);
         if (!event) return res.status(404).json({ message: "Event not found" });
-        res.status(200).json(event);
+        
+        const registeredCount = await Registration.countDocuments({
+            eventId: id,
+            status: "registered",
+        });
+        
+        res.status(200).json({ ...event.toObject(), registeredCount });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -68,12 +74,33 @@ exports.getEventById = async (req, res) => {
 
 exports.getAllEvents = async (req, res) => {
     try {
-        const { category, date } = req.query;
+        const { category, date, page = 1, limit = 6 } = req.query;
         let filter = {};
         if (category) filter.category = category;
         if (date) filter.date = { $gte: new Date(date) };
-        const events = await Event.find(filter).sort({ date: 1 });
-        res.status(200).json(events);
+        
+        const skip = (parseInt(page) - 1) * parseInt(limit);
+        
+        const events = await Event.find(filter)
+            .sort({ date: 1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+            
+        const totalEvents = await Event.countDocuments(filter);
+        
+        const eventsWithCount = await Promise.all(events.map(async (event) => {
+            const registeredCount = await Registration.countDocuments({
+                eventId: event._id,
+                status: "registered",
+            });
+            return { ...event.toObject(), registeredCount };
+        }));
+        
+        res.status(200).json({
+            events: eventsWithCount,
+            totalPages: Math.ceil(totalEvents / parseInt(limit)),
+            currentPage: parseInt(page)
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

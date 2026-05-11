@@ -39,6 +39,7 @@ exports.registerForEvent = async (req, res) => {
         await User.findByIdAndUpdate(userId, {
             $addToSet: { eventsAttending: eventId },
         });
+        
         res.status(201).json({ message: "Registered successfully", registration });
     } catch (err) {
         res.status(500).json({ error: err.message });

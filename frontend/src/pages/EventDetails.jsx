@@ -15,7 +15,6 @@ export default function EventDetails() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-  useEffect(() => {
     const fetchEvent = async () => {
       try {
         const { data } = await api.get(`/events/${id}`);
@@ -27,7 +26,6 @@ export default function EventDetails() {
       }
     };
     fetchEvent();
-  }, [id]);
   }, [id]);
 
   const handleRegister = async () => {

@@ -12,6 +12,22 @@ const eventSchema = new Schema(
             type: String,
             required: true,
         },
+        image: {
+            type: String,
+            default: 'https://picsum.photos/seed/event/800/400'
+        },
+        imagePublicId: {
+            type: String,
+            default: null
+        },
+        video: {
+            type: String,
+            default: null
+        },
+        videoPublicId: {
+            type: String,
+            default: null
+        },
         date: {
             type: Date,
             required: true,
@@ -24,6 +40,10 @@ const eventSchema = new Schema(
             type: Number,
             required: true,
             min: 1,
+        },
+        registeredCount: {
+            type: Number,
+            default: 0
         },
         category: {
             type: String,
@@ -40,4 +60,4 @@ const eventSchema = new Schema(
 );
 
 const Event = mongoose.model("event", eventSchema);
-module.exports = Event;
+module.exports = Event; 
